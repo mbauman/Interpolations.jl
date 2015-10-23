@@ -16,7 +16,7 @@ end
 
 index_gen{IT}(::Type{IT}, N::Integer, offsets...) = index_gen(iextract(IT, min(length(offsets)+1, N)), IT, N, offsets...)
 
-function getindex_impl{T,N,TCoefs,IT<:DimSpec{BSpline},GT<:DimSpec{GridType},Pad}(itp::Type{BSplineInterpolation{T,N,TCoefs,IT,GT,Pad}})
+function getindex_impl{T,N,TCoefs,IT<:DimSpec{BSpline},GT<:DimSpec{GridType},Pad,A}(itp::Type{BSplineInterpolation{T,N,TCoefs,IT,GT,Pad,A}})
     meta = Expr(:meta, :inline)
     quote
         $meta
@@ -39,7 +39,7 @@ end
     getindex_impl(itp)
 end
 
-function gradient_impl{T,N,TCoefs,IT<:DimSpec{BSpline},GT<:DimSpec{GridType},Pad}(itp::Type{BSplineInterpolation{T,N,TCoefs,IT,GT,Pad}})
+function gradient_impl{T,N,TCoefs,IT<:DimSpec{BSpline},GT<:DimSpec{GridType},Pad,A}(itp::Type{BSplineInterpolation{T,N,TCoefs,IT,GT,Pad,A}})
     meta = Expr(:meta, :inline)
     # For each component of the gradient, alternately calculate
     # coefficients and set component
@@ -69,7 +69,7 @@ function gradient_impl{T,N,TCoefs,IT<:DimSpec{BSpline},GT<:DimSpec{GridType},Pad
     end
 end
 
-function getindex_return_type{T,N,TCoefs,IT<:DimSpec{BSpline},GT<:DimSpec{GridType},Pad}(::Type{BSplineInterpolation{T,N,TCoefs,IT,GT,Pad}}, argtypes)
+function getindex_return_type{T,N,TCoefs,IT<:DimSpec{BSpline},GT<:DimSpec{GridType},Pad,A}(::Type{BSplineInterpolation{T,N,TCoefs,IT,GT,Pad,A}}, argtypes)
     Tret = TCoefs
     for a in argtypes
         Tret = Base.promote_op(Base.MulFun, Tret, a)

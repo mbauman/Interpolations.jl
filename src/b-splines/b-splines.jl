@@ -13,8 +13,8 @@ BSpline{D<:Degree}(::D) = BSpline{D}()
 
 bsplinetype{D<:Degree}(::Type{BSpline{D}}) = D
 
-immutable BSplineInterpolation{T,N,TCoefs,IT<:DimSpec{BSpline},GT<:DimSpec{GridType},pad} <: AbstractInterpolation{T,N,IT,GT}
-    coefs::Array{TCoefs,N}
+immutable BSplineInterpolation{T,N,TCoefs,IT<:DimSpec{BSpline},GT<:DimSpec{GridType},pad,A<:AbstractArray} <: AbstractInterpolation{T,N,IT,GT}
+    coefs::A
 end
 function BSplineInterpolation{N,TCoefs,TWeights<:Real,IT<:DimSpec{BSpline},GT<:DimSpec{GridType},pad}(::Type{TWeights}, A::AbstractArray{TCoefs,N}, ::IT, ::GT, ::Val{pad})
     isleaftype(IT) || error("The b-spline type must be a leaf type (was $IT)")
@@ -26,14 +26,14 @@ function BSplineInterpolation{N,TCoefs,TWeights<:Real,IT<:DimSpec{BSpline},GT<:D
     end
     T = typeof(c * one(TCoefs))
 
-    BSplineInterpolation{T,N,TCoefs,IT,GT,pad}(A)
+    BSplineInterpolation{T,N,TCoefs,IT,GT,pad,typeof(A)}(A)
 end
 
 # Utilities for working either with scalars or tuples/tuple-types
 iextract{T<:BSpline}(::Type{T}, d) = T
 iextract{T<:GridType}(::Type{T}, d) = T
 iextract(t, d) = t.parameters[d]
-padding{T,N,TCoefs,IT,GT,pad}(::Type{BSplineInterpolation{T,N,TCoefs,IT,GT,pad}}) = pad
+padding{T,N,TCoefs,IT,GT,pad,A}(::Type{BSplineInterpolation{T,N,TCoefs,IT,GT,pad,A}}) = pad
 padding(itp::AbstractInterpolation) = padding(typeof(itp))
 padextract(pad::Integer, d) = pad
 padextract(pad::Tuple{Vararg{Integer}}, d) = pad[d]
@@ -43,7 +43,7 @@ ubound{T,N,TCoefs,IT}(itp::BSplineInterpolation{T,N,TCoefs,IT,OnGrid}, d) = conv
 lbound{T,N,TCoefs,IT}(itp::BSplineInterpolation{T,N,TCoefs,IT,OnCell}, d) = convert(T, .5)
 ubound{T,N,TCoefs,IT}(itp::BSplineInterpolation{T,N,TCoefs,IT,OnCell}, d) = convert(T, size(itp, d) + .5)
 
-count_interp_dims{T,N,TCoefs,IT<:DimSpec{InterpolationType},GT<:DimSpec{GridType},pad}(::Type{BSplineInterpolation{T,N,TCoefs,IT,GT,pad}}, n) = count_interp_dims(IT, n)
+count_interp_dims{T,N,TCoefs,IT<:DimSpec{InterpolationType},GT<:DimSpec{GridType},pad,A}(::Type{BSplineInterpolation{T,N,TCoefs,IT,GT,pad,A}}, n) = count_interp_dims(IT, n)
 
 function size{T,N,TCoefs,IT,GT,pad}(itp::BSplineInterpolation{T,N,TCoefs,IT,GT,pad}, d)
     d <= N ? size(itp.coefs, d) - 2*padextract(pad, d) : 1

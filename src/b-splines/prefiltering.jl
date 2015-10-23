@@ -33,21 +33,21 @@ prefilter!{TWeights, IT<:BSpline, GT<:GridType}(::Type{TWeights}, A, ::Type{IT},
 prefilter{TWeights, TCoefs, IT<:BSpline, GT<:GridType}(::Type{TWeights}, ::Type{TCoefs}, A, ::Type{IT}, ::Type{GT}) = prefilter!(TWeights, copy!(Array(TCoefs, size(A)), A), IT, GT), Val{0}()
 
 function prefilter{TWeights,TCoefs,TSrc,N,IT<:Quadratic,GT<:GridType}(
-    ::Type{TWeights}, ::Type{TCoefs}, A::Array{TSrc,N}, ::Type{BSpline{IT}}, ::Type{GT}
+    ::Type{TWeights}, ::Type{TCoefs}, A::AbstractArray{TSrc,N}, ::Type{BSpline{IT}}, ::Type{GT}
     )
     ret, Pad = copy_with_padding(TCoefs,A, BSpline{IT})
     prefilter!(TWeights, ret, BSpline{IT}, GT), Pad
 end
 
 function prefilter{TWeights,TCoefs,TSrc,N,IT<:Tuple{Vararg{Union{BSpline,NoInterp}}},GT<:DimSpec{GridType}}(
-    ::Type{TWeights}, ::Type{TCoefs}, A::Array{TSrc,N}, ::Type{IT}, ::Type{GT}
+    ::Type{TWeights}, ::Type{TCoefs}, A::AbstractArray{TSrc,N}, ::Type{IT}, ::Type{GT}
     )
     ret, Pad = copy_with_padding(TCoefs,A, IT)
     prefilter!(TWeights, ret, IT, GT), Pad
 end
 
 function prefilter!{TWeights,TCoefs,N,IT<:Quadratic,GT<:GridType}(
-    ::Type{TWeights}, ret::Array{TCoefs,N}, ::Type{BSpline{IT}}, ::Type{GT}
+    ::Type{TWeights}, ret::AbstractArray{TCoefs,N}, ::Type{BSpline{IT}}, ::Type{GT}
     )
     local buf, shape, retrs
     sz = size(ret)
@@ -60,7 +60,7 @@ function prefilter!{TWeights,TCoefs,N,IT<:Quadratic,GT<:GridType}(
 end
 
 function prefilter!{TWeights,TCoefs,N,IT<:Tuple{Vararg{Union{BSpline,NoInterp}}},GT<:DimSpec{GridType}}(
-    ::Type{TWeights}, ret::Array{TCoefs,N}, ::Type{IT}, ::Type{GT}
+    ::Type{TWeights}, ret::AbstractArray{TCoefs,N}, ::Type{IT}, ::Type{GT}
     )
     local buf, shape, retrs
     sz = size(ret)
